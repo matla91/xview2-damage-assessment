@@ -1,0 +1,33 @@
+project_name: xview2-damage-assessment
+seed: 42
+
+data:
+  root: data/raw/train
+  split_csv: outputs/splits/pair_splits.csv
+  image_size: 256
+  num_classes: 5
+  use_pre_image: false
+  use_post_image: true
+  ignore_index: 255
+
+training:
+  batch_size: 4
+  num_workers: 2
+  epochs: 5
+  learning_rate: 0.0003
+  weight_decay: 0.00001
+  device: auto
+
+model:
+  name: simple_unet
+  in_channels: 3
+  num_classes: 5
+  base_channels: 32
+
+loss:
+  name: cross_entropy
+  class_weights: null
+
+outputs:
+  run_dir: outputs/runs/baseline_unet
+  save_predictions: true
