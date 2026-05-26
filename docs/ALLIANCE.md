@@ -32,7 +32,8 @@ Persistent storage should be placed under your project allocation:
 
 Clone the repository into scratch:
 
-```bash\mkdir -p /scratch/$USER/ml_projects/xview2_damage/repo
+```bash
+mkdir -p /scratch/$USER/ml_projects/xview2_damage/repo
 cd /scratch/$USER/ml_projects/xview2_damage/repo
 git clone https://github.com/matla91/xview2-damage-assessment.git .
 git checkout alliance-structure
