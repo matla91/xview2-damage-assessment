@@ -41,13 +41,38 @@ def train_one_epoch(model, loader, optimizer, criterion, device):
     return running_loss / len(loader.dataset)
 
 
-def main() -> None:
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, required=True)
-    args = parser.parse_args()
+    parser.add_argument("--data-root", type=Path, default=None)
+    parser.add_argument("--split-csv", type=Path, default=None)
+    parser.add_argument("--run-dir", type=Path, default=None)
+    parser.add_argument("--epochs", type=int, default=None)
+    parser.add_argument("--batch-size", type=int, default=None)
+    return parser.parse_args()
+
+
+def apply_cli_overrides(cfg: dict, args: argparse.Namespace) -> dict:
+    if args.data_root is not None:
+        cfg["data"]["root"] = str(args.data_root)
+    if args.split_csv is not None:
+        cfg["data"]["split_csv"] = str(args.split_csv)
+    if args.run_dir is not None:
+        cfg["outputs"]["run_dir"] = str(args.run_dir)
+    if args.epochs is not None:
+        cfg["training"]["epochs"] = args.epochs
+    if args.batch_size is not None:
+        cfg["training"]["batch_size"] = args.batch_size
+    return cfg
+
+
+def main() -> None:
+    args = parse_args()
 
     with open(args.config, "r", encoding="utf-8") as file:
         cfg = yaml.safe_load(file)
+
+    cfg = apply_cli_overrides(cfg, args)
 
     seed = int(cfg.get("seed", 42))
     torch.manual_seed(seed)
@@ -56,6 +81,9 @@ def main() -> None:
     print(f"Using device: {device}")
 
     data_cfg = cfg["data"]
+    print(f"Data root: {data_cfg['root']}")
+    print(f"Split CSV: {data_cfg['split_csv']}")
+
     train_dataset = XBDDamageDataset(
         data_root=data_cfg["root"],
         split_csv=data_cfg["split_csv"],
@@ -78,12 +106,14 @@ def main() -> None:
         batch_size=cfg["training"]["batch_size"],
         shuffle=True,
         num_workers=cfg["training"].get("num_workers", 0),
+        pin_memory=device.type == "cuda",
     )
     val_loader = DataLoader(
         val_dataset,
         batch_size=cfg["training"]["batch_size"],
         shuffle=False,
         num_workers=cfg["training"].get("num_workers", 0),
+        pin_memory=device.type == "cuda",
     )
 
     model_cfg = cfg["model"]
@@ -102,6 +132,8 @@ def main() -> None:
 
     run_dir = Path(cfg["outputs"]["run_dir"])
     run_dir.mkdir(parents=True, exist_ok=True)
+    with open(run_dir / "resolved_config.yaml", "w", encoding="utf-8") as file:
+        yaml.safe_dump(cfg, file, sort_keys=False)
 
     best_miou = -1.0
     epochs = cfg["training"]["epochs"]
