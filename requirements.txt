@@ -5,7 +5,10 @@ Pillow>=10.0
 scikit-learn>=1.3
 PyYAML>=6.0
 tqdm>=4.66
-opencv-python>=4.8
+# Do not install opencv-python on Alliance Canada clusters.
+# If cv2 is needed, load the system module before activating the venv:
+# module load gcc opencv
+# opencv-python>=4.8
 torch>=2.0
 torchvision>=0.15
 jupyterlab>=4.0
