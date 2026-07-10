@@ -4,6 +4,9 @@ __pycache__/
 *.pyo
 *.pyd
 .env
+*.env
+!.env.example
+!configs/paths.example.env
 .venv/
 venv/
 env/
@@ -12,13 +15,27 @@ env/
 .mypy_cache/
 .ruff_cache/
 
-# Data and artifacts
+# Data and artifacts: never commit xView2/xBD data
 data/raw/
 data/interim/
 data/processed/
+datasets/
+*.png
+*.tif
+*.tiff
+*.jpg
+*.jpeg
+*.jsonl
+
+# Outputs and experiments
 outputs/*
 !outputs/README.md
 !outputs/.gitkeep
+experiments/
+logs/
+slurm_logs/
+*.out
+*.err
 
 # Models and checkpoints
 *.pt

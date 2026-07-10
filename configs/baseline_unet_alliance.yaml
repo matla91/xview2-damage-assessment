@@ -1,0 +1,35 @@
+project_name: xview2-damage-assessment
+seed: 42
+
+data:
+  # These values are overridden by the Slurm job through CLI arguments.
+  root: /scratch/USER/ml_projects/xview2_damage/datasets/xview2/raw/train
+  split_csv: /scratch/USER/ml_projects/xview2_damage/datasets/xview2/manifests/pair_splits.csv
+  image_size: 256
+  num_classes: 5
+  use_pre_image: false
+  use_post_image: true
+  ignore_index: 255
+
+training:
+  batch_size: 8
+  num_workers: 8
+  epochs: 10
+  learning_rate: 0.0003
+  weight_decay: 0.00001
+  device: auto
+
+model:
+  name: simple_unet
+  in_channels: 3
+  num_classes: 5
+  base_channels: 32
+
+loss:
+  name: cross_entropy
+  class_weights: null
+
+outputs:
+  # This value is overridden by the Slurm job through --run-dir.
+  run_dir: /scratch/USER/ml_projects/xview2_damage/experiments/baseline_unet/debug
+  save_predictions: true
